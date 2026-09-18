@@ -204,10 +204,14 @@ Both the script and the TUI use three cascading strategies:
 
 ### "Channel is disabled" on channel 6
 
-Regulatory domain restriction. The script automatically tries channels 1 and 11. If the issue persists:
+Regulatory domain restriction. The script automatically tries channels 1 and 11. If the issue persists, set the correct regulatory domain for your country:
 
 ```bash
-sudo iw reg set BR
+# Check current domain
+iw reg get
+
+# Set your country code (e.g., BR for Brazil, DE for Germany, US for USA)
+sudo iw reg set <COUNTRY_CODE>
 ```
 
 ### "Address already assigned" in the IP removal loop
