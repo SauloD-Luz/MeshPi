@@ -1,0 +1,15 @@
+# Compiled binary
+meshpi-tui
+
+# Scripts históricos (não fazem parte do mesh atual)
+script.txt
+script_v3.sh
+
+# PDFs (relatórios, propostas, apresentações)
+*.pdf
+
+# Editor/OS trash
+*~
+*.swp
+.DS_Store
+Thumbs.db
