@@ -44,11 +44,17 @@ Every machine on the same mesh must use the same SSID and channel. Only the IP a
 - `sudo` access (the script runs privileged commands)
 - For the TUI: `libncurses-dev` and `gcc`
 
-### Installing Dependencies
+### Installing Dependencies (one-time setup)
+
+```bash
+sudo ./install.sh
+```
+
+Or manually:
 
 ```bash
 sudo apt update
-sudo apt install -y batctl iw libncurses-dev
+sudo apt install -y batctl iw libncurses-dev gcc
 sudo modprobe batman-adv
 ```
 
@@ -58,7 +64,11 @@ To load `batman-adv` automatically at boot:
 echo batman-adv | sudo tee /etc/modules-load.d/batman-adv.conf
 ```
 
+The `script-mesh.sh` will check that dependencies are present before running and exit with a message if they are missing.
+
 ## Quick Start
+
+> **Before running**, install dependencies: `sudo ./install.sh`
 
 ### 1. Direct script (`script-mesh.sh`)
 
@@ -80,7 +90,7 @@ Assign a different IP to each node within the same /24 subnet:
 
 ### 2. TUI ncurses (`meshpi-tui`)
 
-Compile once:
+Compile once (or run `sudo ./install.sh` which does this automatically):
 
 ```bash
 sudo apt install -y libncurses-dev gcc
@@ -138,7 +148,7 @@ Nodes may take up to **30 seconds** to discover each other (BATMAN-adv OGM inter
   ┌─────────────────────────────────────────────────────────┐
   │ 1. Detect Wi-Fi interface (3 strategies + fallback)      │
   ├─────────────────────────────────────────────────────────┤
-  │ 2. Install batctl/iw if missing                         │
+  │ 2. Verify batctl/iw are installed (exit if missing)      │
   ├─────────────────────────────────────────────────────────┤
   │ 3. Load batman-adv module (modprobe)                    │
   ├─────────────────────────────────────────────────────────┤

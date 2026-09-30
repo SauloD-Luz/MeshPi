@@ -60,10 +60,14 @@ echo ">>> Wi-Fi interface: $INTERFACE"
 echo ">>> Target IP:       $IP_ADDR"
 echo ">>> SSID:            $SSID"
 
-# --- Execution ---
-echo ">>> Installing dependencies..."
-sudo apt install -y batctl iw 2>&1 | tail -3
+# --- Dependency check ---
+if ! command -v batctl &>/dev/null || ! command -v iw &>/dev/null; then
+    echo "ERROR: missing dependencies (batctl, iw)."
+    echo "Run the installer first: sudo ./install.sh"
+    exit 1
+fi
 
+# --- Execution ---
 echo ">>> Loading batman-adv module..."
 sudo modprobe batman-adv
 
