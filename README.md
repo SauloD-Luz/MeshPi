@@ -32,10 +32,13 @@ All network settings are defined as variables at the top of `script-mesh.sh`. Ed
 SSID="MeshPi-Network"     # Name broadcast on the mesh
 CONN_NAME="MeshPi"        # NetworkManager connection label
 CHANNEL=6                 # Wi-Fi channel (fallbacks: 1, 11)
+NETMASK=24                # Subnet mask (CIDR) — overridden if IP argument contains /CIDR
 # --------------------------------------
 ```
 
 Every machine on the same mesh must use the same SSID and channel. Only the IP address differs per node.
+
+The subnet mask can be set in two ways: by editing the `NETMASK` variable above, or by appending the CIDR notation directly to the IP argument — `192.168.1.10/16` — which overrides the variable for that run.
 
 ## Requirements
 
@@ -73,20 +76,22 @@ The `script-mesh.sh` will check that dependencies are present before running and
 ### 1. Direct script (`script-mesh.sh`)
 
 ```bash
-# Automatic Wi-Fi interface detection
+# Automatic Wi-Fi interface detection (default /24, or specify CIDR)
 sudo ./script-mesh.sh 192.168.1.10
+sudo ./script-mesh.sh 192.168.1.10/16
 
 # Or explicit interface (useful on Raspberry Pi — wlan0)
 sudo ./script-mesh.sh wlan0 192.168.1.10
+sudo ./script-mesh.sh wlan0 10.0.0.1/8
 ```
 
-Assign a different IP to each node within the same /24 subnet:
+Assign a different IP (and optionally a different subnet) to each node. All nodes must share the same CIDR to communicate:
 
-| Node | Command | IP |
-|---|---|---|
-| PC1 | `./script-mesh.sh 192.168.1.10` | .10 |
-| PC2 | `./script-mesh.sh 192.168.1.11` | .11 |
-| PC3 | `./script-mesh.sh 192.168.1.12` | .12 |
+| Node | Command | IP | Subnet |
+|---|---|---|---|
+| PC1 | `./script-mesh.sh 192.168.1.10` | .10 | /24 (default) |
+| PC2 | `./script-mesh.sh 192.168.1.11` | .11 | /24 |
+| PC3 | `./script-mesh.sh 192.168.1.12/16` | .12 | /16 (overrides 24) |
 
 ### 2. TUI ncurses (`meshpi-tui`)
 
@@ -162,7 +167,7 @@ Nodes may take up to **30 seconds** to discover each other (BATMAN-adv OGM inter
   ├─────────────────────────────────────────────────────────┤
   │ 7. batctl if add <interface> → creates bat0             │
   ├─────────────────────────────────────────────────────────┤
-  │ 8. Assign configured IP to bat0                         │
+  │ 8. Assign configured IP/CIDR to bat0                   │
   ├─────────────────────────────────────────────────────────┤
   │ 9. Disable Wi-Fi power saving                           │
   └─────────────────────────────────────────────────────────┘

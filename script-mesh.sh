@@ -12,9 +12,10 @@
 # CONFIGURATION section below before running.
 
 # --- CONFIGURATION (edit as needed) ---
-SSID="MeshPi-Network"
-CONN_NAME="MeshPi"
-CHANNEL=6
+SSID="MeshPi-Network"     # Name broadcast on the mesh
+CONN_NAME="MeshPi"        # NetworkManager connection label
+CHANNEL=6                 # Wi-Fi channel (fallbacks: 1, 11)
+NETMASK=24                # Subnet mask (CIDR) — overridden if IP contains /CIDR
 # --------------------------------------
 
 # --- Argument parsing ---
@@ -56,8 +57,16 @@ if [ "$DETECT_INTERFACE" = "1" ]; then
     fi
 fi
 
+# --- Extract CIDR from IP (if present) — then strip it ---
+if echo "$IP_ADDR" | grep -q '/'; then
+    CIDR="${IP_ADDR#*/}"
+    IP_ADDR="${IP_ADDR%/*}"
+else
+    CIDR="$NETMASK"
+fi
+
 echo ">>> Wi-Fi interface: $INTERFACE"
-echo ">>> Target IP:       $IP_ADDR"
+echo ">>> Target IP:       $IP_ADDR/$CIDR"
 echo ">>> SSID:            $SSID"
 
 # --- Dependency check ---
@@ -118,7 +127,7 @@ done
 echo ">>> Adding interface to BATMAN-adv..."
 sudo batctl if add "$INTERFACE"
 sudo ip link set up bat0
-sudo ip addr add "$IP_ADDR/24" dev bat0
+sudo ip addr add "$IP_ADDR/$CIDR" dev bat0
 
 sudo iw dev "$INTERFACE" set power_save off 2>/dev/null || true
 
@@ -128,6 +137,6 @@ iwconfig "$INTERFACE" 2>/dev/null | grep -E "Mode|ESSID|Cell|Frequency"
 batctl if 2>/dev/null
 ip -4 addr show bat0 2>/dev/null | grep inet
 echo ""
-echo "Mesh active at $IP_ADDR via $INTERFACE (SSID: $SSID)"
+echo "Mesh active at $IP_ADDR/$CIDR via $INTERFACE (SSID: $SSID)"
 echo "Neighbors: batctl o"
 echo "Route:     batctl tr <IP>"
