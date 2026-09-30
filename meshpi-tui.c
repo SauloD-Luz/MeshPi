@@ -192,7 +192,7 @@ static void detect_interface(void) {
 static void find_network(void) {
     char *iw_scan, *bat_o, *iwconfig_out, *combined;
 
-    iw_scan = exec_cmd("iw dev %s scan 2>/dev/null | grep -A 5 'IBSS\\\\|freq:\\\\|signal:\\\\|SSID:' | head -80", g_iface);
+    iw_scan = exec_cmd("iw dev %s scan 2>/dev/null | grep -A 5 -E 'IBSS|freq:|signal:|SSID:' | head -80", g_iface);
     bat_o = exec_cmd("batctl o 2>/dev/null | head -30");
     iwconfig_out = exec_cmd("iwconfig %s 2>/dev/null | grep -E 'Mode|ESSID|Cell|Frequency'", g_iface);
 
